@@ -25,7 +25,7 @@ def initweights_to_zero(m):
     if type(m) in {nn.Linear, nn.Conv2d, nn.Linear}:
         torch.nn.init.zeros_(m.weight)
         m.bias.data.fill_(np.random.randn()*0.1) #TODO:check
-    
+
 class ModuleF1(torch.nn.Module):
     def __init__(self, module_caller):
         super(ModuleF1, self).__init__()
@@ -42,7 +42,6 @@ class ModuleF1(torch.nn.Module):
     
     def forward(self, x):
         toret = self.module(x)
-        toret = toret.unsqueeze(-1).unsqueeze(-1)
         return toret
             
 class MainModule(nn.Module):
@@ -75,13 +74,13 @@ class MainModule(nn.Module):
             "dl_test":iter(self.dl_test)
         }
         #make module f1 ===
-        self.module_f1 = ModuleF1(self) #nn.Sequential(
+        self.module_f1 = ModuleF1(self)
         self._lastidx_recurring = []
         #internal field to subsample when feeding minbatch ====
         self.n_subsampleminibatch = None
             
     def forward(self, x, y, n):
-         return self.module_tobecomeGP(x), y, n
+        return self.module_tobecomeGP(x), y, n
         
     
     def func_get_modulef1(self):
