@@ -813,7 +813,7 @@ class GPEXModule(nn.Module):
         return self._list_outputgp_versus_outputg
         
     
-    def checkequal_f1path_gpath_ontest(self, num_iters):
+    def checkequal_GPout_ANNout_ontest(self, num_iters):
         self.eval()
         self._list_outputgp_versus_outputg = []
         
