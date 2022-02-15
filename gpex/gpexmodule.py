@@ -43,10 +43,26 @@ from torch.autograd import Function
 clamp_min, clamp_max = 0.00001, 5.0 #TODO:check #---override
 
 
-def _initweights_to_zero(m):
-    if type(m) in {nn.Linear, nn.Conv2d, nn.Linear}:
+def set_moduleweights_to_zero(m, variance_bais=0.1):
+    '''
+    Given a module, sets the weights of the module to zero, 
+        and sets biases to random values generated around zero.
+    '''
+    setmodule_havingweight = {
+        nn.Conv1d,
+        nn.Conv2d,
+        nn.Conv3d,
+        nn.ConvTranspose1d,
+        nn.ConvTranspose2d,
+        nn.ConvTranspose3d,
+        nn.Linear,
+        nn.Bilinear,
+    }
+    if type(m) in setmodule_havingweight:
         torch.nn.init.zeros_(m.weight)
-        m.bias.data.fill_(np.random.randn()*0.1)
+        if(m.bias is not None):
+            m.bias.data.fill_(np.random.randn()*variance_bais)
+
 
 
 
@@ -369,6 +385,26 @@ class GPEXModule(nn.Module):
                 # ~ self.precomputed_XTX.append(torch.matmul(torch.transpose(sliced_GPX,0,1), sliced_GPX).detach())
         
     
+    
+    def init_UV(self):
+        '''
+        Initializes U (the kernel-space representaitons of the inducing points) and V (the GP posterior values at the inducing points).
+        This function must be called before calling the function `getcost_explainANN`.
+        '''
+        self.initV_from_theannitself()
+        self.initU_from_kernelmappings()
+        
+    
+    def getparams_explainANN(self):
+        '''
+        Returns the parameters to be optimized for explain ANN.
+        When optimizing the cost returned by `getcost_explainANN`, the optimizer has to operate on the parameters
+        returned by this function.
+        '''
+        return self.module_f1.parameters()
+        
+    
+    
     def _inc_rng_headsincompgraph(self):
         if(self._rng_heads_in_compgragh[1] == self.Dv):
             #the head is in its last position
@@ -554,7 +590,7 @@ class GPEXModule(nn.Module):
     
     
     
-    def update_GPX(self):
+    def update_U(self):
         '''
         Updates some elements of GPX based on the current value of the function (i.e. the module) f1(.).
         '''
@@ -583,9 +619,9 @@ class GPEXModule(nn.Module):
         return self._cost_GPmatchNN_term1
         
     
-    def get_costModelParams(self):
+    def getcost_explainANN(self):
         '''
-        Computes cost w.r.t. model params.
+        Computes and returns the cost that encourages the Gaussian processes to behave similar to ANNs.
         '''
         self.flag_svdfailed = False
         self.module_rawmodule.eval()
@@ -936,7 +972,7 @@ class GPEXModule(nn.Module):
         toret = torch.randn([x.size()[0]]+self._size_output_moduletobecomeGP).to(output_f.device)
         return toret
         
-    def initGPY_from_themodelitself(self):
+    def initV_from_theannitself(self):
         '''
         This function initializes the GP_Y based on g(.) values at recurring points.
         '''
@@ -957,7 +993,7 @@ class GPEXModule(nn.Module):
         self.module_rawmodule.train()
             
     
-    def initGPX_from_modulef1(self):
+    def initU_from_kernelmappings(self):
         '''
         Initializes GPX from module f1.
         '''
