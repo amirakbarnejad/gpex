@@ -291,7 +291,7 @@ class GPEXModule(nn.Module):
     '''
     def __init__(self, module_rawmodule, size_recurringdataset, device, func_mainmodule_to_moduletobecomeGP,
                  func_feed_noise_minibatch,
-                 func_feed_recurring_minibatch, func_feed_nonrecurring_minibatch, func_feed_test_minibatch,
+                 func_feed_inducing_minibatch, func_feed_nonrecurring_minibatch, func_feed_test_minibatch,
                  func_get_indices_lastrecurringinstances,
                  func_get_modulef1,
                  flag_efficient = True,
@@ -314,7 +314,7 @@ class GPEXModule(nn.Module):
         self.device = device
         self.func_mainmodule_to_moduletobecomeGP = func_mainmodule_to_moduletobecomeGP
         self.func_feed_noise_minibatch = func_feed_noise_minibatch
-        self.func_feed_recurring_minibatch = func_feed_recurring_minibatch
+        self.func_feed_recurring_minibatch = func_feed_inducing_minibatch
         self.func_feed_nonrecurring_minibatch = func_feed_nonrecurring_minibatch
         self.func_feed_test_minibatch = func_feed_test_minibatch
         self.func_get_indices_lastrecurringinstances = func_get_indices_lastrecurringinstances

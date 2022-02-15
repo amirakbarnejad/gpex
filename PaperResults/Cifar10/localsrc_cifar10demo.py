@@ -138,7 +138,7 @@ class MainModule(nn.Module):
         #print("reached here 4")
         return output, y, n
     
-    def func_feed_recurring_minibatch(self):
+    def func_feed_inducing_minibatch(self):
         output, y, n = self._func_feed_minibatch(
                             self.dl_recurring,
                             str_dlname = "dl_recurring"
