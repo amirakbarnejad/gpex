@@ -17,7 +17,7 @@ python setup_paperresults.py cifar10
 
 Sometimes the above script fails to download the models from google drive due to, e.g., the download quota being exceeded. 
 In this case, "after running the above script" you can manually download and place the models in the directories:
-*Downlaod the model in [this linke](https://drive.google.com/file/d/1aMJ5KBClnv0sLIAuckMK5I1YIYi2Tc61/view?usp=sharing) and save it as
+**Downlaod the model in [this linke](https://drive.google.com/file/d/1aMJ5KBClnv0sLIAuckMK5I1YIYi2Tc61/view?usp=sharing) and save it as
    "Material_PaperResults/Models/ExplainClassifier/cifar10.pt"
 
    
