@@ -7,8 +7,10 @@ TODO: complete description.
 
 import requests
 import os
+import sys
 import urllib
 import tarfile
+import argparse
 
 
 
@@ -132,6 +134,7 @@ def setup_cifar10material():
     '''
     Downloads cifar10 datasets and trained GPEX models.
     '''
+    print("Please wait. The datasets and models are being downloaded ..... ")
     #download cifar10 dataset ====
     dest_path_dataset = os.path.join(
         "Material_PaperResults",
@@ -139,7 +142,13 @@ def setup_cifar10material():
         "Cifar10",
         "cifar-10-python.tar.gz"
     )
-    if(os.path.isfile(dest_path_dataset) == False):
+    fname_checkalready = os.path.join(
+        "Material_PaperResults",
+        "Datasets",
+        "Cifar10",
+        "data_batch_1"
+    )
+    if(os.path.isfile(fname_checkalready) == False):
         urllib.request.urlretrieve(
             "https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz",
             dest_path_dataset
@@ -187,6 +196,7 @@ def setup_cifar10material():
     #download the gpex models ====
     file_id_classifier = '1aMJ5KBClnv0sLIAuckMK5I1YIYi2Tc61'
     file_id_attention  = "1CUNmFgh_trvUvsqnhTYOqQ8geTQ7KSSd"
+    #https://drive.google.com/file/d/1CUNmFgh_trvUvsqnhTYOqQ8geTQ7KSSd/view?usp=sharing
     dest_path_classifier = os.path.join(
         "Material_PaperResults",
         "Models",
@@ -214,8 +224,33 @@ def setup_cifar10material():
 
 
 if __name__ == "__main__":
+    target_datasets = "all" #parser.dataset
+    if(len(sys.argv) > 1):
+        target_datasets = sys.argv[1]
+    if(target_datasets not in ["all", "cifar10", "mnist", "kather", "dogswolves"]):
+        msg_1 = "Unknown argument {}".format(target_datasets)
+        msg_2 = "The argument has to be either all, cifar10, mnist, kather, or dogswolves."
+        raise Exception(msg_1 + "\n" + msg_2)
+    
+    #setup the datasets and models ====
     setup_directories()
-    setup_cifar10material() #TODO:change
+    
+    if(target_datasets == "all"):
+        setup_cifar10material()
+        #TODO: add other datasets
+    elif(target_datasets == "cifar10"):
+        setup_cifar10material()
+    elif(target_datasets == "mnist"):
+        pass #TODO:add
+    elif(target_datasets == "kather"):
+        pass #TODO:add
+    elif(target_datasets == "dogswolves"):
+        pass #TODO:add
+    else:
+        msg_1 = "Unknown argument {}".format(target_datasets)
+        msg_2 = "The argument has to be either all, cifar10, mnist, kather, or dogswolves."
+        raise Exception(msg_1 + "\n" + msg_2)
+        
 
 
 
