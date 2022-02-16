@@ -764,7 +764,7 @@ class GPEXModule(nn.Module):
             return toret
     
     
-    def check_GP_match_ANN_on_aDataloader(self, func_feed_dlinstances, func_get_lastidx_fedinstances, list_allidx):
+    def check_GPmatchANN_on_aDataloader(self, func_feed_dlinstances, func_get_lastidx_fedinstances, list_allidx):
         '''
         Given a daloader, checks whether the GP and the ANN match on the dataloader.
         Inputs. 
