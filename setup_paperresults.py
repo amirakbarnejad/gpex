@@ -7,7 +7,17 @@ TODO: complete description.
 
 import requests
 import os
+import urllib
+import tarfile
 
+
+
+try:
+    from google_drive_downloader import GoogleDriveDownloader as gdd
+except Exception as e:
+    print(str(e))
+    print(" google_drive_downloader was not found \n ****************** you can install it via, e.g., pip *************************")
+    
 #this code snippet is for downloading from gdrive, and is grabbed from 
 #     https://stackoverflow.com/questions/38511444/python-download-files-from-google-drive-using-url 
 
@@ -113,9 +123,99 @@ def setup_directories():
     }
     _setup_directories(dict_input)
     
+def untargz(str_fname, str_destination):
+    file_file = tarfile.open(str_fname)
+    file_file.extractall(str_destination)
+    file_file.close()
+
+def setup_cifar10material():
+    '''
+    Downloads cifar10 datasets and trained GPEX models.
+    '''
+    #download cifar10 dataset ====
+    dest_path_dataset = os.path.join(
+        "Material_PaperResults",
+        "Datasets",
+        "Cifar10",
+        "cifar-10-python.tar.gz"
+    )
+    if(os.path.isfile(dest_path_dataset) == False):
+        urllib.request.urlretrieve(
+            "https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz",
+            dest_path_dataset
+        )
+        untargz(
+            dest_path_dataset,
+            os.path.join(
+                "Material_PaperResults",
+                "Datasets",
+                "Cifar10"
+            )
+        )
+        path_currentroot_cifar10 = os.path.join(
+            "Material_PaperResults",
+            "Datasets",
+            "Cifar10",
+            "cifar-10-batches-py"
+        )
+        path_destinationroot_cifar10 = os.path.join(
+            "Material_PaperResults",
+            "Datasets",
+            "Cifar10"
+        )
+        list_fname_tomove = [
+            "batches.meta",
+            "data_batch_1",
+            "data_batch_2",
+            "data_batch_3",
+            "data_batch_4",
+            "data_batch_5",
+            "test_batch",
+            "readme.html"
+        ]
+        for fname in list_fname_tomove:
+            os.rename(
+                os.path.join(path_currentroot_cifar10, fname),
+                os.path.join(path_destinationroot_cifar10, fname)
+            )
+        os.remove(
+            os.path.join(path_destinationroot_cifar10, "cifar-10-python.tar.gz")
+        )
+        
+        
+
+    #download the gpex models ====
+    file_id_classifier = '1aMJ5KBClnv0sLIAuckMK5I1YIYi2Tc61'
+    file_id_attention  = "1CUNmFgh_trvUvsqnhTYOqQ8geTQ7KSSd"
+    dest_path_classifier = os.path.join(
+        "Material_PaperResults",
+        "Models",
+        "ExplainClassifier",
+        "cifar10.pt"
+    )
+    dest_path_attention = os.path.join(
+        "Material_PaperResults",
+        "Models",
+        "ExplainAttention",
+        "cifar10.pt"
+    )
+    if(os.path.isfile(dest_path_classifier) == False):
+        gdd.download_file_from_google_drive(
+            file_id = file_id_classifier,
+            dest_path = dest_path_classifier
+        )
+    if(os.path.isfile(dest_path_attention) == False):
+        gdd.download_file_from_google_drive(
+            file_id = file_id_attention,
+            dest_path = dest_path_attention
+        )
+
+    
+
 
 if __name__ == "__main__":
     setup_directories()
+    setup_cifar10material() #TODO:change
 
 
 
