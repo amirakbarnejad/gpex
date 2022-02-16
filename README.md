@@ -22,6 +22,8 @@ In this case, "after running the above script" you can manually download and pla
 * Downlaod the model in [this linke](https://drive.google.com/file/d/1aMJ5KBClnv0sLIAuckMK5I1YIYi2Tc61/view?usp=sharing) and save it as
    "Material_PaperResults/Models/ExplainClassifier/cifar10.pt"
 
+* Downlaod the model in [this linke](https://drive.google.com/file/d/1CUNmFgh_trvUvsqnhTYOqQ8geTQ7KSSd/view?usp=sharing) and save it as
+   "Material_PaperResults/Models/ExplainAttention/cifar10.pt"
    
 
 
