@@ -11,6 +11,7 @@ import sys
 import urllib
 import tarfile
 import argparse
+import zipfile
 
 
 
@@ -129,6 +130,10 @@ def untargz(str_fname, str_destination):
     file_file = tarfile.open(str_fname)
     file_file.extractall(str_destination)
     file_file.close()
+    
+def unzipdotzip(str_fname, str_destination):
+    with zipfile.ZipFile(str_fname, 'r') as zip_ref:
+        zip_ref.extractall(str_destination)
 
 def setup_cifar10material():
     '''
@@ -221,6 +226,93 @@ def setup_cifar10material():
         )
 
     
+def setup_mnistmaterial():
+    '''
+    Downloads MNIST datasets and trained GPEX models.
+    '''
+    print("Please wait. The datasets and models are being downloaded ..... ")
+    #download cifar10 dataset ====
+    dest_path_dataset = os.path.join(
+        "Material_PaperResults",
+        "Datasets",
+        "MNIST",
+        "mnist.zip"
+    )
+    fname_checkalready = os.path.join(
+        "Material_PaperResults",
+        "Datasets",
+        "MNIST",
+        "t10k-images-idx3-ubyte.gz"
+    )
+    if(os.path.isfile(fname_checkalready) == False):
+        urllib.request.urlretrieve(
+            "https://data.deepai.org/mnist.zip",
+            dest_path_dataset
+        )
+        unzipdotzip(
+            dest_path_dataset,
+            os.path.join(
+                "Material_PaperResults",
+                "Datasets",
+                "MNIST"
+            )
+        )
+        path_currentroot_mnist = os.path.join(
+            "Material_PaperResults",
+            "Datasets",
+            "MNIST",
+            "mnist"
+        )
+        path_destinationroot_mnist = os.path.join(
+            "Material_PaperResults",
+            "Datasets",
+            "MNIST"
+        )
+        # ~ list_fname_tomove = [
+            # ~ "t10k-images-idx3-ubyte.gz",
+            # ~ "t10k-labels-idx1-ubyte.gz",
+            # ~ "train-images-idx3-ubyte.gz",
+            # ~ "train-labels-idx1-ubyte.gz"
+        # ~ ]
+        # ~ for fname in list_fname_tomove:
+            # ~ print("first  path: {}".format(os.path.join(path_currentroot_mnist, fname)))
+            # ~ print("second path: {}".format(os.path.join(path_destinationroot_mnist, fname)))
+            # ~ os.rename(
+                # ~ os.path.join(path_currentroot_mnist, fname),
+                # ~ os.path.join(path_destinationroot_mnist, fname)
+            # ~ )
+        os.remove(
+            os.path.join(path_destinationroot_mnist, "mnist.zip")
+        )
+        
+        
+
+    #download the gpex models ====
+    file_id_classifier = '16Hbtnq-CtBZ91ToPJXrr0oBpMUTSdbo0'
+    file_id_attention  = "1g_Lod0zaeVv6iQ0uKmpK9bcesqE2yt-M"
+    #https://drive.google.com/file/d/1CUNmFgh_trvUvsqnhTYOqQ8geTQ7KSSd/view?usp=sharing
+    dest_path_classifier = os.path.join(
+        "Material_PaperResults",
+        "Models",
+        "ExplainClassifier",
+        "mnist_classification.pt"
+    )
+    dest_path_attention = os.path.join(
+        "Material_PaperResults",
+        "Models",
+        "ExplainAttention",
+        "mnist_attention.pt"
+    )
+    if(os.path.isfile(dest_path_classifier) == False):
+        gdd.download_file_from_google_drive(
+            file_id = file_id_classifier,
+            dest_path = dest_path_classifier
+        )
+    if(os.path.isfile(dest_path_attention) == False):
+        gdd.download_file_from_google_drive(
+            file_id = file_id_attention,
+            dest_path = dest_path_attention
+        )
 
 
 if __name__ == "__main__":
@@ -237,11 +329,12 @@ if __name__ == "__main__":
     
     if(target_datasets == "all"):
         setup_cifar10material()
+        setup_mnistmaterial()
         #TODO: add other datasets
     elif(target_datasets == "cifar10"):
         setup_cifar10material()
     elif(target_datasets == "mnist"):
-        pass #TODO:add
+        setup_mnistmaterial()
     elif(target_datasets == "kather"):
         pass #TODO:add
     elif(target_datasets == "dogswolves"):
