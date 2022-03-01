@@ -214,14 +214,15 @@ class MainModuleAttention(nn.Module):
         self.batchsize = batchsize
         #self.iter_dl_recurring = iter(self.dl_recurring)
         #make internal module_tobecomeGP ===
-        self.module_classifier = resnetforcifar.ResnetClassifierWithAttention(
+        self.module_classifier = resnetformnist.ResnetClassifierWithAttention(
                 num_classes = 10,
-                block_classifier = resnetforcifar.BasicBlock,
+                block_classifier = resnetformnist.BasicBlock,
                 num_blocks_classifier = [2, 2, 2, 2],
-                block_attention = resnetforcifar.BasicBlock,
+                block_attention = resnetformnist.BasicBlock,
                 num_blocks_attention = [2, 2, 2, 2],
                 dim_before_wideoutput_attention = 200,
-                dim_wideoutput_attention = 1024
+                dim_wideoutput_attention = 1024,
+                input_size = 80
         )
         #make internals ===
         self.dic_dlname_to_iter = {

@@ -11,10 +11,20 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class AkClamp(torch.nn.Module):
+class ImgtoVectorView(nn.Module):
+    def __init__(self):
+        super(ImgtoVectorView, self).__init__()
+    
+    def forward(self, x):
+        assert(len(list(x.size())) == 4)
+        return x[:,:,0,0]
+
+
+
+class Clamp(torch.nn.Module):
     def __init_(self, minval=-1.0, maxval=1.0):
         self.minval, self.maxval = minval, maxval
-        super(AkClamp, self).__init__()
+        super(Clamp, self).__init__()
         
         
     def forward(self, x):
@@ -91,11 +101,11 @@ class Bottleneck(nn.Module):
 
 
 class ResNet(nn.Module):
-    def __init__(self, block, num_blocks, dim_wideoutput, num_classes=10):
+    def __init__(self, block, num_blocks, num_classes=10, dim_wideoutput=10):
         super(ResNet, self).__init__()
         self.in_planes = 64
-        self.block = block
         self.dim_wideoutput = dim_wideoutput
+        self.block = block
         self.num_blocks = num_blocks
         conv1 = nn.Conv2d(3, 64, kernel_size=3,
                                stride=1, padding=1, bias=False)
@@ -104,6 +114,23 @@ class ResNet(nn.Module):
         layer2 = self._make_layer(block, 128, num_blocks[1], stride=2)
         layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
         layer4 = self._make_layer(block, 512, num_blocks[3], stride=2)
+        
+        print(">>>>>>> self.dim_wideoutput = {}".format(self.dim_wideoutput))
+        
+        
+        
+        # ~ self.module_debug = nn.Sequential(
+                            # ~ conv1,
+                            # ~ bn1,
+                            # ~ nn.ReLU(),
+                            # ~ layer1,
+                            # ~ layer2,
+                            # ~ layer3,
+                            # ~ layer4
+                        # ~ )
+        
+        
+        
         self.layers_conv1bn1relu_1234_avgpool = nn.Sequential(
                             conv1,
                             bn1,
@@ -121,14 +148,19 @@ class ResNet(nn.Module):
                             ModuleLinearView(),
                             nn.Sequential(
                                 nn.LeakyReLU(),
-                                nn.Linear(10, dim_wideoutput),
+                                nn.Linear(10, self.dim_wideoutput),
                                 nn.ReLU(),
-                                nn.Linear(dim_wideoutput, num_classes)
+                                nn.Linear(self.dim_wideoutput, num_classes)
                             )
                         )
         
         
-        self.linear = None
+        self.linear = None #nn.Sequential(
+                            # ~ nn.LeakyReLU(),
+                            # ~ nn.Linear(10, 16),
+                            # ~ nn.ReLU(),
+                            # ~ nn.Linear(16, num_classes)
+                         # ~ )
 
     def _make_layer(self, block, planes, num_blocks, stride):
         strides = [stride] + [1]*(num_blocks-1)
@@ -139,21 +171,53 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
+        # ~ out = F.relu(self.bn1(self.conv1(x)))
+        # ~ out = self.layer1(out)
+        # ~ out = self.layer2(out)
+        # ~ out = self.layer3(out)
+        # ~ out = self.layer4(out)
         out = self.layers_conv1bn1relu_1234_avgpool(x)
+        #print("out.shape = {}".format(out.shape)) #[N x 512 x 1 x 1]
+        #out = out.view(out.size(0), -1)
+        #out = self.linear(out)
         return out
 
 
 class ResNet18(ResNet):
-    def __init__(self, dim_wideoutput, num_classes):
-        super(ResNet18, self).__init__(BasicBlock, [2, 2, 2, 2], dim_wideoutput, num_classes)
+    def __init__(self, num_classes=10, dim_wideoutput=10):
+        super(ResNet18, self).__init__(BasicBlock, [2, 2, 2, 2], num_classes, dim_wideoutput)
+
+
+# ~ def AkResNet18():
+    # ~ return AkResNet(BasicBlock, [2, 2, 2, 2])
+
+
+
+def ResNet34():
+    return ResNet(BasicBlock, [3, 4, 6, 3])
+
+
+def ResNet50():
+    return ResNet(Bottleneck, [3, 4, 6, 3])
+
+
+def ResNet101():
+    return ResNet(Bottleneck, [3, 4, 23, 3])
+
+
+def ResNet152():
+    return ResNet(Bottleneck, [3, 8, 36, 3])
 
 
 def test():
-    net = ResNet()
+    net = AkResNet()
     y = net(torch.randn(1, 3, 32, 32))
     print(y.size())
-    
-    
+
+# test()
+
+
+
 class ResNetBackbone(nn.Module):
     def __init__(self, block, num_blocks, dim_before_wideoutput=None, input_size=32, dim_wideoutput=None, flag_setdimoutput_to_one = False):
         super(ResNetBackbone, self).__init__()
@@ -184,7 +248,8 @@ class ResNetBackbone(nn.Module):
                                     nn.ReLU(),
                                     nn.Conv2d(self.dim_before_wideoutput, self.dim_wideoutput, kernel_size=1, padding=0, stride=1),
                                     nn.ReLU(),
-                                    nn.Conv2d(self.dim_wideoutput, 1, kernel_size=1, padding=0, stride=1)
+                                    nn.Conv2d(self.dim_wideoutput, 1, kernel_size=1, padding=0, stride=1),
+                                    torch.nn.BatchNorm2d(1)
                                 )
             else:
                 self.layers_conv1bn1relu_1234 = nn.Sequential(
@@ -209,7 +274,8 @@ class ResNetBackbone(nn.Module):
                                     layer2,
                                     layer3,
                                     layer4,
-                                    nn.Conv2d(512, 1, kernel_size=1, padding=0, stride=1)
+                                    nn.Conv2d(512, 1, kernel_size=1, padding=0, stride=1),
+                                    torch.nn.BatchNorm2d(1)
                                 )
             else:
                 self.layers_conv1bn1relu_1234 = nn.Sequential(
@@ -250,7 +316,11 @@ class ResNetBackbone(nn.Module):
 
 
 class ResnetClassifierWithAttention(nn.Module):
-    def __init__(self, num_classes, block_classifier, num_blocks_classifier, block_attention, num_blocks_attention, dim_before_wideoutput_attention, dim_wideoutput_attention):
+    def __init__(
+                self, num_classes, block_classifier, num_blocks_classifier,
+                block_attention, num_blocks_attention, dim_before_wideoutput_attention,
+                dim_wideoutput_attention, input_size
+        ):
         super(ResnetClassifierWithAttention, self).__init__()
         
         #make the two internal modules ====
@@ -258,14 +328,16 @@ class ResnetClassifierWithAttention(nn.Module):
             block = block_classifier,
             num_blocks = num_blocks_classifier,
             dim_before_wideoutput=None,
-            dim_wideoutput=None
+            dim_wideoutput=None,
+            input_size =input_size
         )
         self.module_attention = ResNetBackbone(
             block = block_attention,
             num_blocks = num_blocks_attention,
             dim_before_wideoutput = dim_before_wideoutput_attention,
             dim_wideoutput = dim_wideoutput_attention,
-            flag_setdimoutput_to_one = True
+            flag_setdimoutput_to_one = True,
+            input_size = input_size
         )
         self.module_linear = nn.Sequential(
             nn.AdaptiveAvgPool2d((1,1)),
