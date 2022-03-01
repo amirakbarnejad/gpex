@@ -19,11 +19,17 @@ Sometimes the above script fails to download the models from google drive due to
 In this case, "after running the above script" you can manually download and place the models in the directories:
 
 
-* Downlaod the model in [this linke](https://drive.google.com/file/d/1aMJ5KBClnv0sLIAuckMK5I1YIYi2Tc61/view?usp=sharing) and save it as
+* Downlaod the model in [this link](https://drive.google.com/file/d/1aMJ5KBClnv0sLIAuckMK5I1YIYi2Tc61/view?usp=sharing) and save it as
    "Material_PaperResults/Models/ExplainClassifier/cifar10.pt"
 
-* Downlaod the model in [this linke](https://drive.google.com/file/d/1CUNmFgh_trvUvsqnhTYOqQ8geTQ7KSSd/view?usp=sharing) and save it as
+* Downlaod the model in [this link](https://drive.google.com/file/d/1CUNmFgh_trvUvsqnhTYOqQ8geTQ7KSSd/view?usp=sharing) and save it as
    "Material_PaperResults/Models/ExplainAttention/cifar10.pt"
+   
+* Downlaod the model in [this link](https://drive.google.com/file/d/16Hbtnq-CtBZ91ToPJXrr0oBpMUTSdbo0/view?usp=sharing) and save it as
+   "Material_PaperResults/Models/ExplainClassifier/mnist_classification.pt"
+   
+* Downlaod the model in [this link](https://drive.google.com/file/d/1g_Lod0zaeVv6iQ0uKmpK9bcesqE2yt-M/view?usp=sharing) and save it as
+   "Material_PaperResults/Models/ExplainAttention/mnist_attention.pt"
    
 
 
