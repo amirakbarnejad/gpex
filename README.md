@@ -1,6 +1,6 @@
 # GPEX
 Let's say we have a general pytorch module. The module has at least one artificial neural network (ANN) as a submodule. 
-![Alt Text](tgpframeworkv.png)
+<img src="tgpframeworkv.png" width="48">
 GPEX replaces the ANN submodule with some Gaussian processes.
 For doing so you will not be involved in details of the algorithm.
 You only specify the ANN submodule and a few API functions, and GPEX does the rest under the hood.  
