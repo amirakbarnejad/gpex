@@ -2,7 +2,7 @@
 Let's say we have a general pytorch module. The module has at least one artificial neural network (ANN) as a submodule. 
 
 
-<img src="tgpframeworkv.png" width="250">
+<img src="tgpframeworkv.png" width="400">
 
 
 GPEX replaces the ANN submodule with some Gaussian processes.
