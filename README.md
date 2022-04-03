@@ -9,7 +9,7 @@ GPEX replaces the ANN submodule with some Gaussian processes.
 For doing so you will not be involved in details of the algorithm.
 You only specify the ANN submodule and a few API functions, and GPEX does the rest under the hood.  
 
-[![button](clickhere.png)](https://sdfsdfsdf)
+[<img src="clickhere.png" width="500"/>](https:https://sdfsdfsdf)
 
 ## Paper Results
 You can find the notebooks in the "PaperResults/" directory.
