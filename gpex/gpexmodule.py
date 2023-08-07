@@ -619,10 +619,10 @@ class GPEXModule(nn.Module):
         return self._cost_GPmatchNN_term1
         
     
+    
+    '''
     def getcost_explainANN(self):
-        '''
-        Computes and returns the cost that encourages the Gaussian processes to behave similar to ANNs.
-        '''
+        #Computes and returns the cost that encourages the Gaussian processes to behave similar to ANNs.
         self.flag_svdfailed = False
         self.module_rawmodule.eval()
         if(self.flag_train_memefficient == True):
@@ -645,7 +645,7 @@ class GPEXModule(nn.Module):
             self._inc_rng_headsincompgraph()
         
         return self._cost_GPmatchNN_term1, output
-    
+    '''
     
     def get_costQvn(self):
         '''
@@ -693,9 +693,10 @@ class GPEXModule(nn.Module):
         '''
         if(self.flag_train_memefficient == False):
             #pass x to g(.)
-            output_g = self.func_rawforward_tobecomeGP(x) #[N x Dv x *]
+            output_g = self.func_rawforward_tobecomeGP(x) #[N x Dv] #REQUIREMENT: output of the ANN module has to be [N x Dv].
+            assert(len(list(output_g.size())) == 2)
             toret = output_g + 0.0
-            output_g = output_g.squeeze() #[N x Dv]
+            #output_g = output_g.squeeze() #[N x Dv]
         
             #pass x to GP(.) path
             output_gp, _ = self._getMuCovforQvhatm(self._reshapeUorV(self.module_f1(x))[0]) #[N x Dv]
@@ -1336,13 +1337,16 @@ class GPEXModule(nn.Module):
     def _forward_makecostGPmatchNN(self, x):
         
         '''
-        The forwrad when making cost for model parameters.
+        The forwrad when making cost for GP-match-ANN.
         This forward must be called when feeding non-recurring instnaces.
+        The input `x` has to be a tensor of shape [N x *] where * is any additional dimensions.
         '''
         #generate samples from Qvn ====
         with torch.no_grad():
-            muqvn = self.func_rawforward_tobecomeGP(x) #[N x C x 1 x 1]
-            muqvn = muqvn.squeeze() #[N x C]
+            muqvn = self.func_rawforward_tobecomeGP(x) #[N x *]
+            dim_2 = np.prod(list(muqvn.size())[1::])
+            muqvn = muqvn.view(-1, dim_2)
+            #muqvn = muqvn.squeeze() #[N x C]
             
             #print("muqvn.shape = {}".format(muqvn.shape))
             Z = torch.normal(mean=0.0, std=1.0, size=list(muqvn.size())).to(self.device) #[Nhw x num_outputheads]
