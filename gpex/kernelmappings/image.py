@@ -506,7 +506,7 @@ class ResnetBackboneKernelDivideAfterAvgPool(nn.Module):
         
     
     def forward(self, x):
-        return self.module3(self.module2(self.module1(x))).unsqueeze(-1).unsqueeze(-1)
+        return self.module3(self.module2(self.module1(x)))
     
         
     def forward_untilbeforeavgpooling(self, x):
