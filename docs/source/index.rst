@@ -7,13 +7,15 @@ Welcome to GPEX's documentation!
    :local:
 
 
-
+.. currentmodule:: gpex
 
 Base Modules
 ------------------------
 
 dsd fs df sd fsd fs dfs fd sdf sdf. sdfs dfsdf
 
+.. autoclass:: GPEXModule
+   :members:
 
 
 Modules
