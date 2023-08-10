@@ -44,17 +44,18 @@ A typical code is as follows:
 >>>    .
 >>>    for _ in range(count_updateU):
 >>>        gpmodel.update_U()
->>>        '''
->>>        The U matrices in the paper have to be updated frequently.
->>>        Ideally `count_updateU` should be very large, so U is updated by going through the dataset onece.
->>>        But in practice event `count_updateU` is set to 1, convergence happens.
->>>        '''
+>>>        #The U matrices in the paper have to be updated frequently.
+>>>        #Ideally `count_updateU` should be very large, so U is updated by going through the dataset onece.
+>>>        #But in practice event when `count_updateU` is set to 1, convergence happens.
+>>>    
+>>>    if(itr%interval_renewXTX == 0):
+>>>        gpexmodule.renew_precomputed_XTX()
+>>>        #The function `renew_precomputed_XTX` should be called 
+>>>        #   in every, e.g. 1000 iterations or so to avoid the propagation of a numerical error in internal computations.
+
 
 Base Modules
 ------------------------
-
-dsd fs df sd fsd fs dfs fd sdf sdf. sdfs dfsdf
-d d s df sdf sdf. 
 
 .. autoclass:: GPEXModule
    :members:
