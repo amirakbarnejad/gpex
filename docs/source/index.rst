@@ -12,6 +12,7 @@ Welcome to GPEX's documentation!
 Introduction
 ------------------------
 .. image:: tgpframeworkv.png
+    :scale: 50 %
 dddd
 
 Base Modules
