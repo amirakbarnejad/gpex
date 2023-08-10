@@ -11,13 +11,14 @@ Welcome to GPEX's documentation!
 
 Introduction
 ------------------------
-GPEX is a tool for performing knowledge distillation between Gaussian processes(GPs) and artificial neural networks (NNs).
+GPEX is a method and tool for performing knowledge distillation between Gaussian processes(GPs) and artificial neural networks (NNs).
 It takes in an arbitrary pytorch module, and replaces one neural-network submodule to be replaced by GPs. 
 
 
 .. image:: tgpframeworkv.png
     :width: 400px
     :height: 200px
+
 
 The pytorch module can be quite general (as depicted above), with a few requirements:
     - It has to have on ANN submodule.
