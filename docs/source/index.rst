@@ -7,14 +7,15 @@ Welcome to GPEX's documentation!
    :local:
 
 
+.. currentmodule:: gpex
+
 Base Modules
 ------------------------
 
-.. autoclass:: BaseInfluenceModule
+.. autoclass:: GPEXModule
    :members:
 
-.. autoclass:: BaseObjective
-   :members:
+
 
 
 Influence Modules
