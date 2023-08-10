@@ -39,12 +39,12 @@ A typical code is as follows:
 >>> gpexmodule.init_UV() #this method has to be called to initialize internal parameters, i.e., the matrices U and V in the paper.
 >>> for itr in range(num_iters):
 >>>    .
->>>    loss = gpmodel.getcost_GPmatchNN() #This is the loss that matches the GP kernel to the ANN submodule.
+>>>    loss = gpexmodule.getcost_GPmatchNN() #This is the loss that matches the GP kernel to the ANN submodule.
 >>>    loss.backward()
 >>>    .
 >>>    .
 >>>    for _ in range(count_updateU):
->>>        gpmodel.update_U()
+>>>        gpexmodule.update_U()
 >>>        #The U matrices in the paper have to be updated frequently.
 >>>        #Ideally `count_updateU` should be very large, so U is updated by going through the dataset onece.
 >>>        #But in practice event when `count_updateU` is set to 1, convergence happens.
