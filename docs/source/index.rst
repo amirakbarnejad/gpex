@@ -11,7 +11,7 @@ Welcome to GPEX's documentation!
 
 Introduction
 ------------------------
-.. image:: ..\\..\\tgpframeworkv.png
+.. image:: tgpframeworkv.png
 dddd
 
 Base Modules
