@@ -16,10 +16,7 @@ dsd fs df sd fsd fs dfs fd sdf sdf. sdfs dfsdf
 
 
 
-Influence Modules
+Modules
 ------------------------
 
-torch-influence provides three subclasses of :class:`BaseInfluenceModule` out-of-the-box.
-Each subclass differs only in how the abstract function :meth:`BaseInfluenceModule.inverse_hvp()`
-is implemented. We refer readers to the original influence function
-paper_ (Koh & Liang, 2017) for further details.
+dddd
