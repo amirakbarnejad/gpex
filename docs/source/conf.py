@@ -22,9 +22,9 @@ copyright = "2023, blindreview"
 author = "blindreview"
 
 # The full version, including alpha/beta/rc tags
-import torch_influence
+import gpex
 
-release = torch_influence.__version__
+#release = torch_influence.__version__
 
 # -- General configuration ---------------------------------------------------
 
