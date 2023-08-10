@@ -7,13 +7,6 @@ requires = ["setuptools>=40.9.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 
-# ========================================= #
-#                   Tests                   #
-# ========================================= #
-
-[tool.pytest.ini_options]
-minversion = 7.0
-testpaths = ["tests"]
 
 # ========================================= #
 #                  Linting                  #
