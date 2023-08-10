@@ -46,3 +46,6 @@ max-line-length = 120
 
 [tool.pylint.TYPECHECK]
 generated-members = ["torch.*"]
+
+[tool.setuptools]
+py-modules = []
