@@ -288,7 +288,7 @@ class forward_replaced:
 
 class GPEXModule(nn.Module):
     '''
-    The main module to be created.
+    The main module to be created in order to use GPEX.
     '''
     def __init__(self, module_rawmodule, size_recurringdataset, device, func_mainmodule_to_moduletobecomeGP,
                  func_feed_noise_minibatch,
@@ -318,7 +318,15 @@ class GPEXModule(nn.Module):
               This function has to have 0 input arguments.
             - func_feed_test_minibatch: in this function you should implement how a mini-batch from the testing dataset is fed to your pytorch module.
               This function has to have 0 input arguments.
-            - func_mainmodule_to_moduletobecomeGP:.
+            - func_get_indices_lastrecurringinstances: A function that returns the indices of the inducing instances which are fed to the module.
+              In other words, when implementing `func_feed_xxx_minibatch` you should put the indices of the inducing instances which are last fed, in a list or os,
+              so you can return it later on in this function. 
+              Importantly, you have to update the list "before" calling any forward functions (as done in the sample notebook).
+              Otherwised, it may lead to unwanted behaviour.
+            - func_get_modulef1: This function has to have 0 input arguments, and returns the kenel module. 
+              In the notation of the paper, let's say ANN has L output heads so there will be L kernel functions.
+              If each kernel-space is considered D-dimensional, the output of the kernel module has to be D*L dimensional,
+              where each group of D dimensions should be L2-normalized. 
         '''
         super(GPEXModule, self).__init__()
         #grab arguments ===
