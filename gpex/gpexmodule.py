@@ -288,7 +288,7 @@ class forward_replaced:
 
 class GPEXModule(nn.Module):
     '''
-    The module that simulates the main module as well as the added GP.
+    The main module to be created.
     '''
     def __init__(self, module_rawmodule, size_recurringdataset, device, func_mainmodule_to_moduletobecomeGP,
                  func_feed_noise_minibatch,
@@ -306,7 +306,19 @@ class GPEXModule(nn.Module):
         '''
         Inputs.
             - module_rawmodule: the raw module in which a module it to be replaced by GP.
-            - func_mainmodule_to_moduletobecomeGP: TODO:adddoc.
+            - size_recurringdataset: the size of the inducing dataset (i.e. the variable M in paper).
+            - device: torch device to be used.
+            - func_mainmodule_to_moduletobecomeGP: a function that takes in your pytorch module, and returns the ANN submodule to be replaced by GP.
+            - func_feed_inducing_minibatch: in this function you should implement how a mini-batch from the inducing dataset is fed to your pytorch module.
+              This function has to have 0 input arguments.
+            - func_feed_noise_minibatch: in this function you should implement how a mini-batch of instances over which the GP is matched to ANN, is fed to your pytorch module.
+              As explained in the paper and implemented in the sample notebook, a proper way is to feed a minibatch of samples like `lambda*x + (1.0-lambda)*(1-x)`.   
+              This function has to have 0 input arguments.
+            - func_feed_nonrecurring_minibatch: in this function you should implement how a mini-batch from the training dataset if fed to your pytorch module.
+              This function has to have 0 input arguments.
+            - func_feed_test_minibatch: in this function you should implement how a mini-batch from the testing dataset is fed to your pytorch module.
+              This function has to have 0 input arguments.
+            - func_mainmodule_to_moduletobecomeGP:.
         '''
         super(GPEXModule, self).__init__()
         #grab arguments ===
