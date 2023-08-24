@@ -13,7 +13,7 @@ You only specify the ANN submodule and a few API functions, and GPEX does the re
 Documentation is available on [gpex.readthedocs.io](https://gpex.readthedocs.io).
 You can also refer to the sample notebook (in folder 'Sample_Notebooks/') for a detailed usage example.
 
-[<img src="clickhere.png" width="500"/>](https://gpex.readthedocs.io)
+[<img src="clickhere.png" width="250"/>](https://gpex.readthedocs.io)
 
 
 ## Paper Results
