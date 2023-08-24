@@ -9,7 +9,12 @@ GPEX replaces the ANN submodule with some Gaussian processes.
 For doing so you will not be involved in details of the algorithm.
 You only specify the ANN submodule and a few API functions, and GPEX does the rest under the hood.  
 
-[<img src="clickhere.png" width="500"/>](https://gpex.readthedocs.io/en/latest/)
+## Documentaton
+Documentation is available on [gpex.readthedocs.io](https://gpex.readthedocs.io).
+You can also refer to the sample notebook (in folder 'Sample_Notebooks/') for a detailed usage example.
+
+[<img src="clickhere.png" width="500"/>](https://gpex.readthedocs.io)
+
 
 ## Paper Results
 You can find the notebooks in the "PaperResults/" directory.
