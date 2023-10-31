@@ -326,7 +326,7 @@ class GPEXModule(nn.Module):
             - func_get_modulef1: This function has to have 0 input arguments, and returns the kenel module. 
               In the notation of the paper, let's say ANN has L output heads so there will be L kernel functions.
               If each kernel-space is considered D-dimensional, the output of the kernel module has to be D*L dimensional,
-              where each group of D dimensions should be L2-normalized. 
+              where each group of D dimensions should be L2-normalized. In the paper experiments kernel module ends with a leaky relu activation.
         '''
         super(GPEXModule, self).__init__()
         #grab arguments ===
