@@ -180,7 +180,7 @@ class MatmulInvXXTplusSigma2:
         D = list(XTX.size())[0]
         N, D = X.size()[0], X.size()[1]
         if(True):
-            landa_1toD, Qd= torch.symeig(XTX, eigenvectors=True) #u, s, v = torch.svd(L)
+            landa_1toD, Qd= torch.linalg.eigh(XTX) #TODO:majorchange torch.symeig(XTX, eigenvectors=True) #u, s, v = torch.svd(L)
             landa_1toD = torch.clamp(landa_1toD, min=0.0001, max=np.inf) #TODO:check
             #find pairwisedifferences between the eigen-values =====
             with torch.no_grad():
