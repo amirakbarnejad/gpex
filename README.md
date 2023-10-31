@@ -15,6 +15,8 @@ You can also refer to the sample notebook (in folder 'Sample_Notebooks/') for a 
 
 [<img src="clickhere.png" width="250"/>](https://gpex.readthedocs.io)
 
+## Installation
+This package is not yet pip-installable. To use this package append the path to gpex folder to `sys.path`, as done in the [sample notebook](https://github.com/amirakbarnejad/gpex/blob/1f4f145481a7556d005a3a1412ce0b88dda57f7d/Sample_Notebooks/MNIST/nb2_matchGP_to_ANN.ipynb).
 
 ## Paper Results
 You can find the notebooks in the "PaperResults/" directory.
