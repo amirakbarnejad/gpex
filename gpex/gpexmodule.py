@@ -1828,8 +1828,8 @@ class GPEXModule(nn.Module):
         with forward_replaced(self.module_tobecomeGP, self._forward_makecostNNmatchGP):
             output_pipeline = self.func_feed_nonrecurring_minibatch()
         task_loss = func_lastGTs_netout_to_taskloss(
-            self.func_lastgroundtruths_predictiontask(),
-            output_pipeline
+            output_pipeline,
+            self.func_lastgroundtruths_predictiontask()
         )
         self.module_rawmodule.train()
         return self._cost_NNmatchGP_term1, task_loss
