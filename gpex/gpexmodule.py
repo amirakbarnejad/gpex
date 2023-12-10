@@ -1820,7 +1820,7 @@ class GPEXModule(nn.Module):
             - ddd
         '''
         self.flag_svdfailed = False
-        self.module_rawmodule.eval()
+        self.module_tobecomeGP.eval()
         with forward_replaced(self.module_tobecomeGP, self._forward_makecostNNmatchGP):
             _ = self.func_feed_noise_minibatch()
         #When matching NN to GP, the forward must be called twice:
@@ -1831,7 +1831,7 @@ class GPEXModule(nn.Module):
             output_pipeline,
             self.func_lastgroundtruths_predictiontask()
         )
-        self.module_rawmodule.train()
+        self.module_tobecomeGP.train()
         return self._cost_NNmatchGP_term1, task_loss
         
         
