@@ -301,7 +301,8 @@ class GPEXModule(nn.Module):
                  flag_controlvariate = True,
                  int_mode_controlvariate = 2,
                  flag_train_memefficient = False,
-                 memefficeint_heads_in_compgraph = None
+                 memefficeint_heads_in_compgraph = None,
+                 func_lastgroundtruths_predictiontask = None
          ):
         '''
         Inputs.
@@ -327,6 +328,9 @@ class GPEXModule(nn.Module):
               In the notation of the paper, let's say ANN has L output heads so there will be L kernel functions.
               If each kernel-space is considered D-dimensional, the output of the kernel module has to be D*L dimensional,
               where each group of D dimensions should be L2-normalized. In the paper experiments kernel module ends with a leaky relu activation.
+            - func_lastgroundtruths_predictiontask: this function is to be used only when matching NN to GP (i.e. if the function `getcost_NNmatchGP` is to be used).
+                When matching NN to GP, the task loss (e.g. the cross-entropy loss if the task is classification) appears.
+                So the last ground-truth values of the prediction task are needed to compute that term of loss.
         '''
         super(GPEXModule, self).__init__()
         #grab arguments ===
@@ -346,7 +350,7 @@ class GPEXModule(nn.Module):
         self.flag_controlvariate = flag_controlvariate
         self.flag_train_memefficient = flag_train_memefficient
         self.memefficeint_heads_in_compgraph = memefficeint_heads_in_compgraph
-        
+        self.func_lastgroundtruths_predictiontask = func_lastgroundtruths_predictiontask
              
         
         #make internals ===
@@ -1803,22 +1807,32 @@ class GPEXModule(nn.Module):
 
         return muqvn #TODO:does it make a difference if it's generated_vn?
 
-    def getcost_NNmatchGP(self):
+    def getcost_NNmatchGP(self, func_lastGTs_netout_to_taskloss):
         '''
         Computes the cost w.r.t. ANN parameters.
+        Inputs.
+            - func_lastGTs_netout_to_taskloss: a function that takes in
+                    1. the last ground-truths, as returned by `self.func_lastgroundtruths_predictiontask`
+                    2. the output of the whole pipeline
+                and returns the task loss (i.e. the cross-entropy loss for a classification task).
         :return:
             - ddd
             - ddd
         '''
-        pass
         self.flag_svdfailed = False
         self.module_rawmodule.eval()
         with forward_replaced(self.module_tobecomeGP, self._forward_makecostNNmatchGP):
             _ = self.func_feed_noise_minibatch()
-        #TODO:HERE when matching NN to GP, the forward must be called twice:
+        #When matching NN to GP, the forward must be called twice:
         #       1) noise mini-batch for NNmatchGP, 2) normal training mini-batch to minimize the task loss.
+        with forward_replaced(self.module_tobecomeGP, self._forward_makecostNNmatchGP):
+            output_pipeline = self.func_feed_nonrecurring_minibatch()
+        task_loss = func_lastGTs_netout_to_taskloss(
+            self.func_lastgroundtruths_predictiontask,
+            output_pipeline
+        )
         self.module_rawmodule.train()
-        return self._cost_NNmatchGP_term1 #TODO:HERE add the task loss
+        return self._cost_NNmatchGP_term1, task_loss
         
         
         
