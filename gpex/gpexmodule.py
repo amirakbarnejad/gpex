@@ -1743,6 +1743,82 @@ class GPEXModule(nn.Module):
                 print("Du_per_f1module = {}".format(Du_per_f1module))
                 self.Du = int(self.Dv * Du_per_f1module)
         self.train()
+
+
+    def _forward_makecostNNmatchGP(self, x):
+
+        '''
+        The forwrad of `self.module_tobecomeGP` when making cost for NN-match-GP.
+        This forward must be called when feeding non-recurring instnaces.
+        The input `x` has to be a tensor of shape [N x *] where * is any additional dimensions.
+        '''
+        # Feed to the ANN (generate samples from Qvn) ====
+        muqvn = self.func_rawforward_tobecomeGP(x)  # [N x *]
+        dim_2 = np.prod(list(muqvn.size())[1::])
+        muqvn = muqvn.view(-1, dim_2)
+        Z = torch.normal(mean=0.0, std=1.0, size=list(muqvn.size())).to(self.device)  # [Nhw x num_outputheads]
+        generated_vn = muqvn + torch.sqrt(self.cov_qvn) * Z  # [* x Dv]
+
+
+        # feed to GP  (to avoid changing the code, torch.no_grad() is added to cancel-out the gradient computeation)
+        with torch.no_grad():
+            with forward_replaced(self.module_tobecomeGP, self._forward_setfield_lastGPX_recurring):
+                self.func_feed_recurring_minibatch()
+
+            # separate the gradpass and detach parts for GPX and GPY
+            list_idxrecurring = self.func_get_indices_lastrecurringinstances()
+            with torch.no_grad():
+                idx_fixed = list(set(range(self.size_recurringdataset)) - set(list_idxrecurring))
+                GPX_fixed = self.GP_X[idx_fixed, :].detach()  # [n' x M], [n' x num_outputheads]
+                GPY_fixed = self.GP_Y[idx_fixed, :].detach()  # TODO:check should be detached???
+            GPX_gradpass = self.lastGPX_recurring  # [minibatch x Du]
+            GPY_gradpass = self.GP_Y[list_idxrecurring, :].detach()
+            local_GPX = torch.cat([GPX_fixed, GPX_gradpass], 0)  # [size_recurringdataset x Du]
+            local_GPY = torch.cat([GPY_fixed, GPY_gradpass], 0)  # [size_recurringdataset x Dv]
+
+            # compute mu() and cov() according to GP and by detaching GP_Y====
+            if (self.flag_efficient == True):
+                dict_args_efficiency = {
+                    "mode": "allowgrad",
+                    "precomputed_XTX": self.precomputed_XTX,
+                    "idx_in_inputarg": [list(GPX_fixed.size())[0],
+                                        list(GPX_fixed.size())[0] + list(GPX_gradpass.size())[0]],
+                    "idx_in_globalGPX": list_idxrecurring,
+                    "global_GPX": self.GP_X
+                }
+            else:
+                dict_args_efficiency = None
+
+            mu_pvn, cov_pvn = self._forwardGP(
+                self.module_f1(x),
+                local_GPX,
+                local_GPY,
+                dict_args_efficiency=dict_args_efficiency
+            )  # self._getMuCovforModelParams(x)
+            cov_pvn = cov_pvn.detach()
+
+        # compute term1
+        term1 = NormalUtils.loglikelihood_1D(muqvn, mu_pvn.detach(), cov_pvn.detach())
+        self._cost_NNmatchGP_term1 = -torch.mean(torch.sum(term1, 1))
+
+        return muqvn #TODO:does it make a difference if it's generated_vn?
+
+    def getcost_NNmatchGP(self):
+        '''
+        Computes the cost w.r.t. ANN parameters.
+        :return:
+            - ddd
+            - ddd
+        '''
+        pass
+        self.flag_svdfailed = False
+        self.module_rawmodule.eval()
+        with forward_replaced(self.module_tobecomeGP, self._forward_makecostNNmatchGP):
+            _ = self.func_feed_noise_minibatch()
+        #TODO:HERE when matching NN to GP, the forward must be called twice:
+        #       1) noise mini-batch for NNmatchGP, 2) normal training mini-batch to minimize the task loss.
+        self.module_rawmodule.train()
+        return self._cost_NNmatchGP_term1 #TODO:HERE add the task loss
         
         
         
@@ -1866,5 +1942,4 @@ class NormalUtils:
             # ~ )
         
         return toret
-        
 
