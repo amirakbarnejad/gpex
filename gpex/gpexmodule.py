@@ -1807,14 +1807,24 @@ class GPEXModule(nn.Module):
 
         return muqvn #TODO:does it make a difference if it's generated_vn?
 
-    def getcost_NNmatchGP(self, func_lastGTs_netout_to_taskloss):
+    def getcost_NNmatchGP(self, func_lastGTs_netout_to_taskloss, functor_setmode_matchortaskloss):
         '''
         Computes the cost w.r.t. ANN parameters.
+        This functionality is in the development stage.
         Inputs.
             - func_lastGTs_netout_to_taskloss: a function that takes in
                     1. the last ground-truths, as returned by `self.func_lastgroundtruths_predictiontask`
                     2. the output of the whole pipeline
                 and returns the task loss (i.e. the cross-entropy loss for a classification task).
+            - functor_setmode_matchortaskloss: The raw module may behave differently when matching NN-GP and when performing the task.
+                For example if the output of the NN is [Nx2] containing activations for 2 classes, 
+                one may want to model netout[:,1]-netout[:,0] with a single kernel-space and GP.
+                In this case in te "match" mode the ann submodule outputs `netout[:,1]-netout[:,0]` while in the 
+                    "taskloss" mode the ann submodule outputs netout of shape [Nx2].
+                The object `functor_setmode_matchortaskloss` must implement two functions.
+                    - functor_setmode_matchortaskloss.setmode_match
+                    - functor_setmode_matchortaskloss.setmode_taskloss
+            an object that implements
         :return:
             - ddd
             - ddd
@@ -1822,10 +1832,13 @@ class GPEXModule(nn.Module):
         self.flag_svdfailed = False
         self.module_rawmodule.eval()
         self.module_tobecomeGP.eval()
+        
+        functor_setmode_matchortaskloss.setmode_match()
         with forward_replaced(self.module_tobecomeGP, self._forward_makecostNNmatchGP):
             _ = self.func_feed_noise_minibatch()
         #When matching NN to GP, the forward must be called twice:
         #       1) noise mini-batch for NNmatchGP, 2) normal training mini-batch to minimize the task loss.
+        functor_setmode_matchortaskloss.setmode_taskloss()
         with forward_replaced(self.module_tobecomeGP, self._forward_makecostNNmatchGP):
             output_pipeline = self.func_feed_nonrecurring_minibatch()
         task_loss = func_lastGTs_netout_to_taskloss(
@@ -1834,6 +1847,7 @@ class GPEXModule(nn.Module):
         )
         self.module_tobecomeGP.train()
         self.module_rawmodule.train()
+        functor_setmode_matchortaskloss.setmode_match()
         return self._cost_NNmatchGP_term1, task_loss
         
         
